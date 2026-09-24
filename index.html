@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MMM-CLUB 2026 | Word Jij Onze Volgende Muzikant?</title>
+  <!-- Google Fonts: Oswald condensed en Syne/Special Elite voor poster look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Oswald:wght@600;700&family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --poster-cream: #faf2df;
+      --poster-rust: #be4835;
+      --poster-rust-dark: #983827;
+      --poster-charcoal: #1d1b18;
+    }
+
+    body {
+      background-color: #ef4444;
+      background-image: radial-gradient(#dc2626 15%, transparent 16%), radial-gradient(#dc2626 15%, transparent 16%);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .poster-container {
+      background-color: var(--poster-cream);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(0, 0, 0, 0.1);
+    }
+
+    .poster-font-title {
+      font-family: 'Anton', 'Oswald', sans-serif;
+      letter-spacing: -0.01em;
+      line-height: 0.92;
+      text-transform: uppercase;
+      color: var(--poster-rust);
+    }
+
+    .poster-font-sub {
+      font-family: 'Oswald', sans-serif;
+      letter-spacing: 0.04em;
+    }
+
+    .dashed-border-inner {
+      border: 2px dashed #dc2626;
+    }
+
+    /* Vinyl record animation */
+    @keyframes spinRecord {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .spinning {
+      animation: spinRecord 6s linear infinite;
+    }
+
+    .spinning-fast {
+      animation: spinRecord 0.7s linear infinite;
+    }
+
+    /* Marquee animation */
+    @keyframes marquee {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .animate-marquee {
+      display: inline-flex;
+      white-space: nowrap;
+      animation: marquee 16s linear infinite;
+    }
+
+    .animate-marquee:hover {
+      animation-play-state: paused;
+    }
+
+    /* Dot matrix pattern */
+    .halftone-overlay {
+      background-image: radial-gradient(rgba(190, 72, 53, 0.18) 1.5px, transparent 1.5px);
+      background-size: 8px 8px;
+    }
+
+    /* Troll cursor */
+    .kazoo-cursor {
+      cursor: crosshair;
+    }
+
+    /* Shake animation */
+    @keyframes trollShake {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-5deg) scale(1.05); }
+      75% { transform: rotate(5deg) scale(0.95); }
+    }
+    .shake-head {
+      animation: trollShake 0.35s ease-in-out infinite alternate;
+    }
+  </style>
+</head>
+<body class="p-2 sm:p-6 md:p-10 flex flex-col items-center justify-center min-h-screen text-[#1d1b18]">
+
+  <!-- POSTER CONTAINER -->
+  <main class="poster-container relative w-full max-w-[850px] p-4 sm:p-8 rounded-md dashed-border-inner transition-all duration-300">
+    
+    <!-- Top red pin decoration -->
+    <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-red-600 rounded-full border-2 border-white shadow-md flex items-center justify-center z-30">
+      <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+    </div>
+
+    <!-- HEADER: INSTROOM | MMM-CLUB | 2026 -->
+    <header class="flex justify-between items-center text-[11px] sm:text-xs tracking-widest font-bold text-[#be4835] border-b border-[#be4835]/20 pb-3 mb-6 font-mono uppercase">
+      <span class="hover:text-black cursor-pointer" onclick="playKazooNote(300, 'sawtooth'); triggerMemeText('INSTROOM: 100% KAZOU GEVAAR')">INSTROOM</span>
+      <span class="bg-[#be4835] text-white px-2 py-0.5 rounded cursor-pointer animate-pulse hover:bg-black" onclick="molAlarm()">MMM-CLUB 🔊</span>
+      <span class="hover:text-black cursor-pointer" onclick="playSecretChord()">2026</span>
+    </header>
+
+    <!-- HERO SECTION WITH TITLE & VINYL RECORD -->
+    <div class="relative grid grid-cols-1 md:grid-cols-12 gap-6 items-start pb-4">
+      <div class="md:col-span-8 z-10">
+        <h1 id="mainTitle" class="poster-font-title text-4xl sm:text-6xl md:text-7xl font-bold leading-none cursor-pointer select-none transition-transform active:scale-95" onclick="trollTitleClick()">
+          WORD JIJ ONZE VOLGENDE MMM-MUZIKANT?
+        </h1>
+        <p class="text-xs sm:text-sm font-mono text-[#be4835] mt-2 font-bold tracking-tight">
+          ⚡ <i>(Klik op willekeurige teksten voor ongevraagde muzikale sabotages)</i>
+        </p>
+      </div>
+
+      <!-- Halftone Vinyl Record element -->
+      <div class="md:col-span-4 flex justify-end relative">
+        <div id="vinylWrapper" class="relative -mr-2 md:-mr-10 -mt-6 group cursor-pointer" title="Draai aan de plaat!">
+          <!-- Vinyl disc SVG -->
+          <div id="vinylDisc" class="w-40 h-40 sm:w-52 sm:h-52 md:w-60 md:h-60 rounded-full bg-black border-4 border-[#333] shadow-2xl relative flex items-center justify-center spinning transition-all">
+            <!-- Vinyl Grooves -->
+            <div class="absolute inset-2 rounded-full border border-gray-700/60 opacity-80 pointer-events-none"></div>
+            <div class="absolute inset-5 rounded-full border border-gray-600/50 opacity-70 pointer-events-none"></div>
+            <div class="absolute inset-9 rounded-full border border-gray-700/50 opacity-60 pointer-events-none"></div>
+            <div class="absolute inset-14 rounded-full border border-gray-600/40 opacity-50 pointer-events-none"></div>
+            
+            <!-- Vinyl Halftone pattern overlay -->
+            <div class="absolute inset-0 rounded-full opacity-35 bg-[radial-gradient(#ffffff_1.5px,transparent_1.5px)] [background-size:6px_6px] pointer-events-none"></div>
+            
+            <!-- Vinyl Center Label -->
+            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-[#be4835] rounded-full border-4 border-amber-100 flex flex-col items-center justify-center text-center p-1 text-white shadow-inner">
+              <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tighter leading-tight">MMM 2026</span>
+              <span class="text-[6px] tracking-widest text-amber-200">33 RPM</span>
+              <div class="w-3 h-3 bg-[#faf2df] rounded-full mt-0.5 border border-black"></div>
+            </div>
+          </div>
+
+          <!-- Vinyl Play/Scratch Badge -->
+          <div class="absolute -bottom-2 right-2 bg-yellow-400 text-black text-[10px] font-bold px-2 py-0.5 rounded shadow border border-black rotate-[-6deg] group-hover:rotate-0 transition-transform">
+            🖱️ KLIK & SCRATCH!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION: NODIG OM TOE TE TREDEN (TROLL CHECKLIST) -->
+    <section class="mt-4 bg-[#f2e6cb]/70 p-4 sm:p-5 rounded-md border border-[#be4835]/30">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="poster-font-title text-2xl sm:text-3xl text-[#be4835]">
+          NODIG OM TOE TE TREDEN?
+        </h2>
+        <span class="text-[11px] font-mono text-neutral-600 bg-white/70 px-2 py-0.5 rounded border border-neutral-300">
+          Status: <strong id="trollScore">0/4 Geslaagd</strong>
+        </span>
+      </div>
+
+      <p class="text-xs text-neutral-600 mb-3 italic">
+        Vink alle voorwaarden aan om toegelaten te worden tot de audities. (Pas op: niet valsspelen!)
+      </p>
+
+      <ul class="space-y-2.5 text-sm sm:text-base font-medium">
+        <li class="flex items-start gap-2.5 bg-white/40 p-2 rounded hover:bg-white/70 transition">
+          <input type="checkbox" id="req1" class="troll-box mt-1 w-5 h-5 accent-[#be4835] cursor-pointer" onchange="handleTrollCheckbox(1)">
+          <label for="req1" class="cursor-pointer select-none">
+            <strong>Kledij als muzikant</strong> – zodat je vermomd binnenkomt in de club.
+          </label>
+        </li>
+        <li class="flex items-start gap-2.5 bg-white/40 p-2 rounded hover:bg-white/70 transition">
+          <input type="checkbox" id="req2" class="troll-box mt-1 w-5 h-5 accent-[#be4835] cursor-pointer" onchange="handleTrollCheckbox(2)">
+          <label for="req2" class="cursor-pointer select-none">
+            <strong>Kussentje</strong> – voor tijdens het wachten op de beste muziek.
+          </label>
+        </li>
+        <li class="flex items-start gap-2.5 bg-white/40 p-2 rounded hover:bg-white/70 transition">
+          <input type="checkbox" id="req3" class="troll-box mt-1 w-5 h-5 accent-[#be4835] cursor-pointer" onchange="handleTrollCheckbox(3)">
+          <label for="req3" class="cursor-pointer select-none">
+            <strong>Snack/drankje</strong> – om te blijven dansen op de beats.
+          </label>
+        </li>
+        <li class="flex items-start gap-2.5 bg-white/40 p-2 rounded hover:bg-white/70 transition">
+          <input type="checkbox" id="req4" class="troll-box mt-1 w-5 h-5 accent-[#be4835] cursor-pointer" onchange="handleTrollCheckbox(4)">
+          <label for="req4" class="cursor-pointer select-none">
+            <strong>A5-foto van je gezicht</strong> – zodat je niet té mysterieus blijft.
+          </label>
+        </li>
+      </ul>
+
+      <!-- Hidden troll alert inside checklist -->
+      <div id="checklistFeedback" class="hidden mt-3 p-2 bg-red-100 border border-red-400 text-red-800 text-xs rounded font-bold">
+        ⚠️ Alarm: Laure zag dat je een optie probeerde aan te vinken zonder Kazou-vergunning!
+      </div>
+    </section>
+
+    <!-- SECTION: STORY BLOCK -->
+    <section class="mt-6 space-y-3 text-[#2d2823] text-sm sm:text-[15px] leading-relaxed">
+      <h2 class="poster-font-title text-2xl sm:text-3xl text-[#be4835] tracking-wide">
+        WAAR MUZIEK EN MYSTERIE SAMENKOMEN: MMM-CLUB 2026.
+      </h2>
+      
+      <p>
+        De MMM-club draaide jarenlang in perfecte harmonie... tot plots steeds meer mensen kwamen luisteren. Meer publiek betekent meer chaos, en dus meer muzikanten. Daarom recruteren we jullie.
+      </p>
+      
+      <p>
+        Hier leer je alles wat een MMM-muzikant moet kunnen: omgaan met unieke fans, ervaren hoe een dag als muzikant eruitziet, en alle andere info over de MMM die je zeker moet weten.
+      </p>
+
+      <p class="font-medium bg-[#be4835]/10 p-3 border-l-4 border-[#be4835] rounded-r">
+        "We kunnen niet wachten om jullie te zien. Welkom in de MMM-club, waar niemand zeker weet wie écht meespeelt... en wie stiekem playbackt."
+      </p>
+    </section>
+
+    <!-- RUNNING BANNER RIBBON -->
+    <div class="my-6 -mx-4 sm:-mx-8 overflow-hidden bg-[#be4835] text-white py-2 shadow-inner select-none font-bold text-sm sm:text-base uppercase tracking-wider">
+      <div class="animate-marquee whitespace-nowrap">
+        <span>🎷 MYSTERIEUZE MOL MUZIKANTEN // WIE PLAYBACKT ER? // LAURE ZIET ALLES // JARNE SPEELT TE HARD // GEEN VALSE NOTEN TOEGESTAAN // MMM-CLUB 2026 // KAZOU CHAOS // &nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <span>🎷 MYSTERIEUZE MOL MUZIKANTEN // WIE PLAYBACKT ER? // LAURE ZIET ALLES // JARNE SPEELT TE HARD // GEEN VALSE NOTEN TOEGESTAAN // MMM-CLUB 2026 // KAZOU CHAOS // &nbsp;&nbsp;&nbsp;&nbsp;</span>
+      </div>
+    </div>
+
+    <!-- SECTION: DE BEGELEIDERS / LAURE & JARNE -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6 my-4">
+      
+      <!-- LAURE KAART -->
+      <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-4 rounded-lg bg-[#f4ebd0] border border-[#be4835]/30 hover:shadow-md transition group relative overflow-hidden">
+        <!-- Badge -->
+        <span class="absolute top-2 right-2 text-[9px] font-bold bg-[#be4835] text-white px-1.5 py-0.5 rounded uppercase">22 Optredens</span>
+        
+        <!-- Foto Laure / SVG Avatar styled as B&W photo -->
+        <div class="relative cursor-pointer shrink-0" onclick="triggerLaureSound()" title="Klik op Laure!">
+          <div id="laurePhoto" class="w-28 h-28 sm:w-24 sm:h-24 rounded border-2 border-[#be4835] grayscale contrast-125 object-cover bg-neutral-300 flex items-center justify-center overflow-hidden shadow">
+            <svg class="w-full h-full text-neutral-800" viewBox="0 0 100 100" fill="currentColor">
+              <rect width="100" height="100" fill="#bbb" />
+              <!-- Female avatar hair + face mimicking portrait -->
+              <path d="M25,85 C25,50 30,30 50,30 C70,30 75,50 75,85 Z" fill="#222"/>
+              <ellipse cx="50" cy="52" rx="20" ry="24" fill="#eee"/>
+              <!-- Scarf / kazou sjaaltje -->
+              <polygon points="40,75 60,75 50,96" fill="#be4835"/>
+              <circle cx="43" cy="48" r="3" fill="#333"/>
+              <circle cx="57" cy="48" r="3" fill="#333"/>
+              <path d="M44,60 Q50,68 56,60" stroke="#333" stroke-width="2" fill="none"/>
+              <path d="M20,40 Q25,20 50,20 Q75,20 80,40 Q85,70 75,90" fill="none" stroke="#222" stroke-width="8"/>
+            </svg>
+          </div>
+          <span class="absolute -bottom-2 -left-1 bg-amber-200 text-black text-[9px] font-mono px-1 rounded shadow border border-black group-hover:scale-105">
+            🔊 Tik mij!
+          </span>
+        </div>
+
+        <div>
+          <h3 class="poster-font-title text-2xl text-[#be4835] uppercase tracking-wide">LAURE</h3>
+          <p class="text-xs sm:text-sm text-neutral-800 leading-snug mt-1">
+            Laure vast geroest in haar vak. Met maar liefsts <strong>22 optredens</strong>, staat ze paraat om jullie vlot te begeleiden in de MMM-club.
+          </p>
+          <button onclick="triggerLaureSound()" class="mt-2 text-xs text-[#be4835] underline font-bold hover:text-black">
+            🕵️ Beluister Laure's inspectiefluit
+          </button>
+        </div>
+      </div>
+
+      <!-- JARNE KAART -->
+      <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-4 rounded-lg bg-[#f4ebd0] border border-[#be4835]/30 hover:shadow-md transition group relative overflow-hidden">
+        <!-- Badge -->
+        <span class="absolute top-2 right-2 text-[9px] font-bold bg-black text-amber-300 px-1.5 py-0.5 rounded uppercase">100% Chaos</span>
+        
+        <!-- Foto Jarne / SVG Avatar -->
+        <div class="relative cursor-pointer shrink-0" onclick="triggerJarneSound()" title="Klik op Jarne!">
+          <div id="jarnePhoto" class="w-28 h-28 sm:w-24 sm:h-24 rounded border-2 border-[#be4835] grayscale contrast-125 bg-neutral-300 flex items-center justify-center overflow-hidden shadow">
+            <svg class="w-full h-full text-neutral-800" viewBox="0 0 100 100" fill="currentColor">
+              <rect width="100" height="100" fill="#c4c4c4" />
+              <!-- Male avatar with curls + kazou sjaaltje -->
+              <ellipse cx="50" cy="50" rx="19" ry="23" fill="#eee"/>
+              <path d="M30,35 Q50,15 70,35 Q75,20 50,18 Q25,20 30,35" fill="#111"/>
+              <!-- Curly hair curls -->
+              <circle cx="34" cy="30" r="7" fill="#111"/>
+              <circle cx="45" cy="24" r="8" fill="#111"/>
+              <circle cx="58" cy="25" r="8" fill="#111"/>
+              <circle cx="67" cy="31" r="7" fill="#111"/>
+              <!-- Face -->
+              <circle cx="44" cy="48" r="3" fill="#222"/>
+              <circle cx="56" cy="48" r="3" fill="#222"/>
+              <path d="M43,62 Q50,71 57,62" stroke="#222" stroke-width="2.5" fill="none"/>
+              <!-- Kazou sjaal met 'KAZOU' -->
+              <polygon points="35,76 65,76 50,98" fill="#be4835"/>
+              <text x="50" y="87" font-size="6" fill="#fff" font-family="sans-serif" font-weight="900" text-anchor="middle">KAZOU</text>
+            </svg>
+          </div>
+          <span class="absolute -bottom-2 -left-1 bg-amber-200 text-black text-[9px] font-mono px-1 rounded shadow border border-black group-hover:scale-105">
+            🎸 Tik mij!
+          </span>
+        </div>
+
+        <div>
+          <h3 class="poster-font-title text-2xl text-[#be4835] uppercase tracking-wide">JARNE</h3>
+          <p class="text-xs sm:text-sm text-neutral-800 leading-snug mt-1">
+            Jarne speelt harder dan zijn schaduw. Half muzikant, half mysterieus, <strong>100% chaos</strong>. Met zijn acht optredens loodst hij jullie richting MMM-muzikantschap.
+          </p>
+          <button onclick="triggerJarneSound()" class="mt-2 text-xs text-[#be4835] underline font-bold hover:text-black">
+            💥 Start Jarne's valse solo
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- INTERACTIVE TROLL CONTROL CENTER -->
+    <div class="mt-8 border-t-2 border-dashed border-[#be4835]/40 pt-6">
+      <div class="text-center mb-4">
+        <span class="inline-block bg-[#be4835] text-white text-[11px] font-black uppercase px-3 py-1 rounded-full shadow">
+          🎛️ MMM Audition Mini-Soundboard
+        </span>
+        <p class="text-xs text-neutral-600 mt-1">Test of jouw instrument geschikt is voor onze playback-harmonie:</p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs font-bold">
+        <button onclick="playKazouSollicitatie()" class="bg-amber-100 hover:bg-amber-200 border-2 border-[#be4835] text-[#be4835] py-2.5 px-3 rounded shadow active:translate-y-0.5 transition">
+          🎺 Valse Kazoo Solo
+        </button>
+        <button onclick="playAirhorn()" class="bg-amber-100 hover:bg-amber-200 border-2 border-[#be4835] text-[#be4835] py-2.5 px-3 rounded shadow active:translate-y-0.5 transition">
+          🚨 MLG Airhorn
+        </button>
+        <button onclick="playMolSuspense()" class="bg-amber-100 hover:bg-amber-200 border-2 border-[#be4835] text-[#be4835] py-2.5 px-3 rounded shadow active:translate-y-0.5 transition">
+          🔍 De Mol Jingle
+        </button>
+        <button onclick="startPlaybackSabotage()" class="bg-red-700 hover:bg-red-800 border-2 border-black text-white py-2.5 px-3 rounded shadow active:translate-y-0.5 transition">
+          💣 Saboteer Optreden
+        </button>
+      </div>
+    </div>
+
+    <!-- FLEEING TROLL ENROLLMENT BUTTON -->
+    <div class="relative h-32 mt-6 flex items-center justify-center">
+      <button id="runawayBtn" 
+              class="absolute z-20 px-6 py-3.5 bg-[#be4835] hover:bg-[#983827] text-white text-base sm:text-lg font-black uppercase tracking-wider rounded-lg shadow-xl border-2 border-black transition-all duration-150 cursor-pointer select-none">
+        👉 KLIK HIER OM JE DIRECT IN TE SCHRIJVEN!
+      </button>
+      <p class="text-xs text-neutral-500 italic mt-16 font-mono text-center">
+        (Tip: vlieg er snel met je muis overheen als je een echte muzikale reflex hebt)
+      </p>
+    </div>
+
+    <!-- PLAYBACK TEST WIDGET -->
+    <div class="mt-4 p-4 rounded-md bg-[#be4835]/5 border border-[#be4835]/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <h4 class="font-bold text-sm text-[#be4835]">🎤 Doe de Live Playback-Test</h4>
+        <p class="text-xs text-neutral-600">Onze geavanceerde AI scant of jij echt fluit of stiekem doet alsof.</p>
+      </div>
+      <button onclick="runPlaybackTest()" class="shrink-0 bg-neutral-900 text-amber-200 hover:bg-black font-mono text-xs px-4 py-2 rounded border border-neutral-700">
+        🎙️ Start Microfoon Check
+      </button>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="mt-8 pt-4 border-t border-[#be4835]/30 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-600 font-mono gap-3">
+      <div>
+        <span>🌐 Officiële domeinreferentie: </span>
+        <a href="https://mmmclub.onrender.com" target="_blank" class="text-[#be4835] font-bold hover:underline">
+          www.mmmclub.onrender.com
+        </a>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="openDeployHelper()" class="bg-[#be4835] text-white px-3 py-1 rounded text-[11px] font-sans font-bold hover:bg-black transition">
+          🚀 Host instructies Render.com
+        </button>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- MODAL: DE MOL CAPTCHA TROLL -->
+  <div id="molModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#faf2df] border-4 border-[#be4835] p-6 rounded-lg max-w-md w-full shadow-2xl relative">
+      <button onclick="closeModal('molModal')" class="absolute top-2 right-2 text-lg font-bold text-neutral-700 hover:text-black">✖</button>
+      <div class="text-center">
+        <div class="text-4xl mb-2">🕵️‍♂️</div>
+        <h3 class="poster-font-title text-2xl text-[#be4835]">BEVESTIG DAT JE NIET DE MOL BENT</h3>
+        <p class="text-xs text-neutral-700 mt-2 mb-4">
+          Laure vereist een veiligheidscontrole: <br>
+          <strong>Selecteer welk instrument Jarne 100% foutloos kan bespelen:</strong>
+        </p>
+
+        <div class="grid grid-cols-2 gap-2 text-xs font-semibold mb-4">
+          <button onclick="molFail('Viool')" class="p-2 border border-[#be4835] rounded bg-white hover:bg-red-50">🎻 Viool</button>
+          <button onclick="molFail('Trompet')" class="p-2 border border-[#be4835] rounded bg-white hover:bg-red-50">🎺 Gouden Trompet</button>
+          <button onclick="molFail('Harp')" class="p-2 border border-[#be4835] rounded bg-white hover:bg-red-50">🎵 Hemelse Harp</button>
+          <button onclick="molSuccess()" class="p-2 border-2 border-dashed border-red-600 rounded bg-amber-100 hover:bg-amber-200">❌ Helemaal Geen Instrument</button>
+        </div>
+
+        <p id="molStatus" class="text-xs font-bold text-red-600 min-h-[20px]"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: RICKROLL / GEFELICITEERD ALS TRIANGEL SPELER -->
+  <div id="successModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#faf2df] border-4 border-yellow-500 p-6 rounded-lg max-w-lg w-full shadow-2xl text-center">
+      <div class="text-5xl mb-2">🎉🔔🎶</div>
+      <h3 class="poster-font-title text-3xl text-[#be4835]">PROFICIAT! JE HEBT DE KNOP GEVANGEN!</h3>
+      <p class="text-sm text-neutral-800 my-3 font-medium">
+        Je reflexen zijn te snel voor Laure en Jarne. Je bent bij dezen officieel aangenomen als:
+      </p>
+      <div class="bg-yellow-200 border-2 border-black p-3 rounded font-mono font-bold text-base text-red-800 mb-4">
+        ✨ EERSTE RESERVE TRIANGEL-BEVRACHTER DER MMM-CLUB ✨
+      </div>
+      <p class="text-xs text-neutral-600 mb-4">
+        Je contract is bindend voor alle 22 volgende optredens. Breng je kussentje en snack mee!
+      </p>
+      <button onclick="closeModal('successModal'); triggerConfetti();" class="bg-[#be4835] text-white px-6 py-2.5 rounded font-bold hover:bg-black">
+        Ik accepteer mijn triangel lot
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: RENDER HOSTING INSTRUCTIES -->
+  <div id="deployModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border-2 border-black p-6 rounded-lg max-w-xl w-full max-h-[90vh] overflow-y-auto text-left">
+      <div class="flex justify-between items-center border-b pb-2 mb-4">
+        <h3 class="font-bold text-lg text-[#be4835]">🚀 Hoe host je dit op onrender (mmmclub.onrender.com)?</h3>
+        <button onclick="closeModal('deployModal')" class="text-xl font-bold">✖</button>
+      </div>
+
+      <p class="text-xs text-neutral-700 mb-4">
+        Render.com biedt gratis statische sites aan via GitHub. Volg deze simpele 3 stappen:
+      </p>
+
+      <ol class="space-y-3 text-xs text-neutral-800 list-decimal pl-4">
+        <li>
+          <strong>Sla dit bestand op:</strong>
+          Kopieer deze volledige HTML-code en sla hem op als <code>index.html</code> in een lege map.
+        </li>
+        <li>
+          <strong>Zet op GitHub:</strong>
+          Maak een gratis GitHub repository aan (bijv. <code>mmmclub</code>) en push deze <code>index.html</code> erin.
+        </li>
+        <li>
+          <strong>Koppel aan Render:</strong>
+          <ul class="list-disc pl-4 mt-1 space-y-1 text-neutral-600">
+            <li>Ga naar <a href="https://dashboard.render.com" target="_blank" class="text-blue-600 underline">dashboard.render.com</a>.</li>
+            <li>Klik op <strong>New +</strong> &gt; <strong>Static Site</strong>.</li>
+            <li>Selecteer jouw GitHub repository.</li>
+            <li>Vul bij <i>Name</i> in: <strong>mmmclub</strong> (zodat je URL automatisch <strong>mmmclub.onrender.com</strong> wordt mits die nog vrij is!).</li>
+            <li>Publish Directory: laat leeg of typ <code>.</code> (punt).</li>
+            <li>Klik op <strong>Create Static Site</strong>. Binnen 30 seconden staat je one-pager live!</li>
+          </ul>
+        </li>
+      </ol>
+
+      <div class="mt-6 flex justify-end">
+        <button onclick="closeModal('deployModal')" class="bg-neutral-800 text-white text-xs px-4 py-2 rounded hover:bg-black">
+          Begrepen!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING MEME BANNER CONTAINER -->
+  <div id="floatingMeme" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-yellow-300 border-2 border-black text-black px-4 py-2 rounded-full font-black text-xs shadow-2xl opacity-0 pointer-events-none transition-all duration-300 z-50">
+  </div>
+
+  <script>
+    /* =========================================================
+       WEB AUDIO API SYNTHESIZER VOOR TROLL GELUIDEN
+       (Geen externe audio-bestanden nodig, 100% self-contained)
+       ========================================================= */
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function getAudioCtx() {
+      if (!audioCtx) {
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    // Speelt een valse Kazoo noot
+    function playKazooNote(freq = 280, type = 'sawtooth', duration = 0.3) {
+      try {
+        const ctx = getAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const distortion = ctx.createWaveShaper();
+
+        // Kazoo buzz effect via wave shaper curve
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        // Lichte vibrato
+        osc.frequency.linearRampToValueAtTime(freq * 1.15, ctx.currentTime + duration * 0.5);
+        osc.frequency.linearRampToValueAtTime(freq * 0.95, ctx.currentTime + duration);
+
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {
+        console.log("Audio not allowed yet");
+      }
+    }
+
+    // Melodie van valse Kazoo
+    function playKazouSollicitatie() {
+      const notes = [261, 293, 329, 349, 392, 330, 220, 440, 233];
+      notes.forEach((freq, idx) => {
+        setTimeout(() => {
+          playKazooNote(freq, 'sawtooth', 0.22);
+        }, idx * 180);
+      });
+      triggerMemeText("🎺 KAZOO AUDITIE: LAURE ZEGT NEE, JARNE ZEGT JA!");
+    }
+
+    // MLG Airhorn Sound via multi-oscillators
+    function playAirhorn() {
+      const ctx = getAudioCtx();
+      const freqs = [466.16, 466.16, 466.16, 622.25];
+      const timings = [0, 0.12, 0.24, 0.4];
+      const durations = [0.1, 0.1, 0.1, 0.45];
+
+      freqs.forEach((f, i) => {
+        setTimeout(() => {
+          const osc1 = ctx.createOscillator();
+          const osc2 = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          osc1.type = 'sawtooth';
+          osc2.type = 'square';
+          osc1.frequency.setValueAtTime(f, ctx.currentTime);
+          osc2.frequency.setValueAtTime(f * 1.01, ctx.currentTime);
+
+          gain.gain.setValueAtTime(0.25, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + durations[i]);
+
+          osc1.connect(gain);
+          osc2.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc1.start();
+          osc2.start();
+          osc1.stop(ctx.currentTime + durations[i]);
+          osc2.stop(ctx.currentTime + durations[i]);
+        }, timings[i] * 1000);
+      });
+      triggerMemeText("📢 AIRHORN: 100% MAXIMUM CHAOS ACTIVATED!");
+    }
+
+    // De Mol Suspense Jingle
+    function playMolSuspense() {
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(120, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(45, ctx.currentTime + 1.2);
+
+      gain.gain.setValueAtTime(0.35, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + 1.2);
+
+      setTimeout(() => {
+        document.getElementById('molModal').classList.remove('hidden');
+      }, 500);
+    }
+
+    // Scratch geluid voor vinyl
+    function playScratchSound() {
+      const ctx = getAudioCtx();
+      const bufferSize = ctx.sampleRate * 0.15;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 1000 + Math.random() * 1000;
+      filter.Q.value = 3;
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.4, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+
+      noise.start();
+    }
+
+    /* =========================================================
+       INTERACTIES & TROLL MECHANISMEN
+       ========================================================= */
+
+    // Vinyl interactie
+    const vinylWrapper = document.getElementById('vinylWrapper');
+    const vinylDisc = document.getElementById('vinylDisc');
+
+    vinylWrapper.addEventListener('click', () => {
+      playScratchSound();
+      vinylDisc.classList.toggle('spinning-fast');
+      triggerMemeText("📀 DJ MMM OP DE TAFELS!");
+    });
+
+    // Checkbox Sabotage: Vink je de een aan, springt een ander uit
+    let checkCount = 0;
+    function handleTrollCheckbox(index) {
+      playKazooNote(180 + index * 50, 'triangle', 0.15);
+      const boxes = [1, 2, 3, 4].map(i => document.getElementById('req' + i));
+      const checkedBoxes = boxes.filter(b => b.checked);
+
+      document.getElementById('trollScore').innerText = `${checkedBoxes.length}/4 Geslaagd`;
+
+      // Als gebruiker er meer dan 2 aanvinkt, saboteer er eentje!
+      if (checkedBoxes.length >= 3) {
+        setTimeout(() => {
+          const others = boxes.filter((b, i) => b.checked && (i + 1) !== index);
+          if (others.length > 0) {
+            const victim = others[Math.floor(Math.random() * others.length)];
+            victim.checked = false;
+            playKazooNote(110, 'sawtooth', 0.4);
+            const feedback = document.getElementById('checklistFeedback');
+            feedback.classList.remove('hidden');
+            feedback.innerText = "❌ Sabotage! Jarne heeft zojuist één van je ingevulde items opgegeten!";
+            setTimeout(() => feedback.classList.add('hidden'), 3500);
+            document.getElementById('trollScore').innerText = `${boxes.filter(b => b.checked).length}/4 Geslaagd`;
+          }
+        }, 400);
+      }
+    }
+
+    // Wegspringende inschrijfknop (Fleeing troll button)
+    const runawayBtn = document.getElementById('runawayBtn');
+    let escapeAttempts = 0;
+
+    function moveButtonRandomly() {
+      escapeAttempts++;
+      const parent = runawayBtn.parentElement;
+      const rect = parent.getBoundingClientRect();
+      const maxX = rect.width - runawayBtn.offsetWidth - 20;
+      const maxY = 140;
+
+      const randomX = (Math.random() * 200) - 100;
+      const randomY = (Math.random() * 80) - 40;
+
+      runawayBtn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+      playKazooNote(300 + (escapeAttempts * 40), 'sine', 0.1);
+
+      if (escapeAttempts === 3) {
+        triggerMemeText("🏃‍♂️ OEFEN EERST JE KAZOO-LADDERS!");
+      } else if (escapeAttempts >= 7) {
+        runawayBtn.innerText = "ALÉ KOM DAN HIER!";
+      }
+    }
+
+    runawayBtn.addEventListener('mouseenter', moveButtonRandomly);
+    runawayBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      moveButtonRandomly();
+    });
+
+    runawayBtn.addEventListener('click', () => {
+      // Als ze hem toch vangen
+      document.getElementById('successModal').classList.remove('hidden');
+      triggerConfetti();
+    });
+
+    // Laure geluid
+    function triggerLaureSound() {
+      const img = document.getElementById('laurePhoto');
+      img.classList.add('shake-head');
+      setTimeout(() => img.classList.remove('shake-head'), 1200);
+
+      // Speelt strakke scheidsrechterfluit / inspectietoon
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(1760, ctx.currentTime + 0.15);
+      osc.frequency.linearRampToValueAtTime(880, ctx.currentTime + 0.3);
+
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+
+      triggerMemeText("👀 Laure heeft al 22 optredens overleefd. Jij nog nul.");
+    }
+
+    // Jarne geluid
+    function triggerJarneSound() {
+      const img = document.getElementById('jarnePhoto');
+      img.classList.add('shake-head');
+      setTimeout(() => img.classList.remove('shake-head'), 1200);
+
+      playKazooNote(150, 'sawtooth', 0.5);
+      playAirhorn();
+      triggerMemeText("🎸 JARNE SPEELT SOLOS IN 17 VERSCHILLENDE TOONAARDEN TEGELIJK!");
+    }
+
+    // Playback sabotage
+    function startPlaybackSabotage() {
+      document.body.classList.add('invert');
+      playKazooNote(80, 'sawtooth', 0.8);
+      triggerMemeText("⚡ ALARM: IEMAND HEEFT DE STEKKER VAN DE PLAYBACK-TAPE ERUIT GETROKKEN!");
+      setTimeout(() => {
+        document.body.classList.remove('invert');
+      }, 700);
+    }
+
+    // Playback test knop
+    function runPlaybackTest() {
+      triggerMemeText("🎙️ Luisteren naar microfoon... Zeg 'MMM'!");
+      setTimeout(() => {
+        playKazooNote(110, 'sawtooth', 0.6);
+        alert("📊 UITSLAG PLAYBACK-TEST:\n\n100% VALSE LUCHT GEDETECTEERD!\nConclusie: Je bent perfect gekwalificeerd om mee te playbacken bij Jarne & Laure.");
+      }, 1500);
+    }
+
+    // De Mol captcha reacties
+    function molFail(instrument) {
+      playKazooNote(100, 'sawtooth', 0.4);
+      document.getElementById('molStatus').innerText = `Fout! Jarne kent de handleiding van de ${instrument} niet eens.`;
+    }
+
+    function molSuccess() {
+      document.getElementById('molStatus').innerText = "Correct! Je kent Jarne door en door. Test geslaagd!";
+      triggerConfetti();
+      setTimeout(() => {
+        closeModal('molModal');
+      }, 1200);
+    }
+
+    // Algemene troll tekstflitser
+    function triggerMemeText(msg) {
+      const banner = document.getElementById('floatingMeme');
+      banner.innerText = msg;
+      banner.style.opacity = '1';
+      banner.style.transform = 'translate(-50%, -10px)';
+      setTimeout(() => {
+        banner.style.opacity = '0';
+        banner.style.transform = 'translate(-50%, 0px)';
+      }, 2800);
+    }
+
+    function trollTitleClick() {
+      const colors = ['#be4835', '#1d1b18', '#3b82f6', '#16a34a', '#d97706'];
+      const pick = colors[Math.floor(Math.random() * colors.length)];
+      document.getElementById('mainTitle').style.color = pick;
+      playKazooNote(440 + Math.random() * 300, 'sawtooth', 0.15);
+    }
+
+    function molAlarm() {
+      playMolSuspense();
+    }
+
+    function playSecretChord() {
+      playKazooNote(523.25, 'triangle', 0.4);
+      setTimeout(() => playKazooNote(659.25, 'triangle', 0.4), 100);
+      setTimeout(() => playKazooNote(783.99, 'triangle', 0.4), 200);
+      triggerConfetti();
+    }
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.7 }
+        });
+      }
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function openDeployHelper() {
+      document.getElementById('deployModal').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
